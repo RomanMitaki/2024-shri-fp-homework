@@ -116,16 +116,47 @@ export const validateFieldN5 = (figures) => {
 };
 
 // 6. Ровно две зеленые фигуры (одна из зелёных – это треугольник), плюс одна красная. Четвёртая оставшаяся любого доступного цвета, но не нарушающая первые два условия
-export const validateFieldN6 = () => false;
+export const validateFieldN6 = (figures) => {
+    const redFigures = R.map(fn => fn(figures), [isRedSquare, isRedStar, isRedCircle, isRedTriangle]);
+    const countRedFigures = R.count(R.equals(true));
+    const redFiguresCount = countRedFigures(redFigures);
+
+    const greenFigures = R.map(fn => fn(figures), [isGreenSquare, isGreenStar, isGreenCircle, isGreenTriangle]);
+    const countGreenFigures = R.count(R.equals(true));
+    const greenFiguresCount = countGreenFigures(greenFigures);
+
+    const isOneRedFigure = R.equals(redFiguresCount, 1);
+    const isTwoGreenFigures = R.equals(greenFiguresCount, 2);
+
+    return isGreenTriangle(figures) && isTwoGreenFigures && isOneRedFigure;
+};
 
 // 7. Все фигуры оранжевые.
-export const validateFieldN7 = () => false;
+export const validateFieldN7 = (figures) => {
+    const isValid = R.allPass([isOrangeStar, isOrangeSquare, isOrangeCircle, isOrangeTriangle]);
+    return isValid(figures);
+};
 
 // 8. Не красная и не белая звезда, остальные – любого цвета.
-export const validateFieldN8 = () => false;
+export const validateFieldN8 = (figures) => {
+    const isValid = R.anyPass([isBlueStar, isOrangeStar, isGreenStar]);
+    return isValid(figures);
+};
 
 // 9. Все фигуры зеленые.
-export const validateFieldN9 = () => false;
+export const validateFieldN9 = (figures) => {
+    const isValid = R.allPass([isGreenStar, isGreenSquare, isGreenCircle, isGreenTriangle]);
+    return isValid(figures);
+};
 
 // 10. Треугольник и квадрат одного цвета (не белого), остальные – любого цвета
-export const validateFieldN10 = () => false;
+export const validateFieldN10 = (figures) => {
+    const isRed = R.allPass([isRedTriangle, isRedSquare]);
+    const isBlue = R.allPass([isBlueTriangle, isBlueSquare]);
+    const isOrange = R.allPass([isOrangeTriangle, isOrangeSquare]);
+    const isGreen = R.allPass([isGreenTriangle, isGreenSquare]);
+
+    const isValid = R.anyPass([isRed, isOrange, isGreen, isBlue]);
+
+    return isValid(figures);
+};
