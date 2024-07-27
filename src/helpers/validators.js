@@ -87,10 +87,33 @@ export const validateFieldN3 = (figures) => {
 };
 
 // 4. Синий круг, красная звезда, оранжевый квадрат треугольник любого цвета
-export const validateFieldN4 = () => false;
+export const validateFieldN4 = (figures) => {
+    const isValid = R.allPass([isRedStar, isOrangeSquare, isBlueCircle]);
+    return isValid(figures);
+};
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
-export const validateFieldN5 = () => false;
+export const validateFieldN5 = (figures) => {
+    const redFigures = R.map(fn => fn(figures), [isRedSquare, isRedStar, isRedCircle, isRedTriangle]);
+    const countRedFigures = R.count(R.equals(true));
+    const redFiguresCount = countRedFigures(redFigures);
+
+    const blueFigures = R.map(fn => fn(figures), [isBlueSquare, isBlueStar, isBlueCircle, isBlueTriangle]);
+    const countBlueFigures = R.count(R.equals(true));
+    const blueFiguresCount = countBlueFigures(blueFigures);
+
+    const orangeFigures = R.map(fn => fn(figures), [isOrangeSquare, isOrangeStar, isOrangeCircle, isOrangeTriangle]);
+    const countOrangeFigures = R.count(R.equals(true));
+    const orangeFiguresCount = countOrangeFigures(orangeFigures);
+
+    const greenFigures = R.map(fn => fn(figures), [isGreenSquare, isGreenStar, isGreenCircle, isGreenTriangle]);
+    const countGreenFigures = R.count(R.equals(true));
+    const greenFiguresCount = countGreenFigures(greenFigures);
+
+    const res = R.count(R.gte(R.__, 3), [greenFiguresCount, orangeFiguresCount, blueFiguresCount, redFiguresCount]);
+
+    return res > 0;
+};
 
 // 6. Ровно две зеленые фигуры (одна из зелёных – это треугольник), плюс одна красная. Четвёртая оставшаяся любого доступного цвета, но не нарушающая первые два условия
 export const validateFieldN6 = () => false;
