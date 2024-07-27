@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 /**
  * @file Домашка по FP ч. 1
  *
@@ -12,21 +14,77 @@
  *
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
+/*
+RED: 'red',
+    BLUE: 'blue',
+    ORANGE: 'orange',
+    GREEN: 'green',
+    WHITE: 'white',
+
+ */
+const isRed = (figureColor) => figureColor === 'red';
+const isBlue = (figureColor) => figureColor === 'blue';
+const isOrange = (figureColor) => figureColor === 'orange';
+const isGreen = (figureColor) => figureColor === 'green';
+const isWhite = (figureColor) => figureColor === 'white';
+
+const getStarColor = R.prop('star');
+const getSquareColor = R.prop('square');
+const getTriangleColor = R.prop('triangle');
+const getCircleColor = R.prop('circle');
+
+const isRedStar = R.compose(isRed, getStarColor);
+const isBlueStar = R.compose(isBlue, getStarColor);
+const isOrangeStar = R.compose(isOrange, getStarColor);
+const isGreenStar = R.compose(isGreen, getStarColor);
+const isWhiteStar = R.compose(isWhite, getStarColor);
+
+const isRedSquare = R.compose(isRed, getSquareColor);
+const isBlueSquare = R.compose(isBlue, getSquareColor);
+const isOrangeSquare = R.compose(isOrange, getSquareColor);
+const isGreenSquare = R.compose(isGreen, getSquareColor);
+const isWhiteSquare = R.compose(isWhite, getSquareColor);
+
+const isRedTriangle = R.compose(isRed, getTriangleColor);
+const isBlueTriangle = R.compose(isBlue, getTriangleColor);
+const isOrangeTriangle = R.compose(isOrange, getTriangleColor);
+const isGreenTriangle = R.compose(isGreen, getTriangleColor);
+const isWhiteTriangle = R.compose(isWhite, getTriangleColor);
+
+const isRedCircle = R.compose(isRed, getCircleColor);
+const isBlueCircle = R.compose(isBlue, getCircleColor);
+const isOrangeCircle = R.compose(isOrange, getCircleColor);
+const isGreenCircle = R.compose(isGreen, getCircleColor);
+const isWhiteCircle = R.compose(isWhite, getCircleColor);
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
-export const validateFieldN1 = ({star, square, triangle, circle}) => {
-    if (triangle !== 'white' || circle !== 'white') {
-        return false;
-    }
-
-    return star === 'red' && square === 'green';
+export const validateFieldN1 = (figures) => {
+    const isDemandedFiguresWhite = R.allPass([isWhiteTriangle, isWhiteCircle]);
+    const isValid = R.allPass([isRedStar, isGreenSquare, isDemandedFiguresWhite]);
+    return isValid(figures);
 };
 
 // 2. Как минимум две фигуры зеленые.
-export const validateFieldN2 = () => false;
+export const validateFieldN2 = (figures) => {
+    const greenFigures = R.map(fn => fn(figures), [isGreenSquare, isGreenStar, isGreenCircle, isGreenTriangle]);
+    const countGreenFigures = R.count(R.equals(true));
+    const greenFiguresCount = countGreenFigures(greenFigures);
+    return greenFiguresCount >= 2;
+
+};
 
 // 3. Количество красных фигур равно кол-ву синих.
-export const validateFieldN3 = () => false;
+export const validateFieldN3 = (figures) => {
+    const redFigures = R.map(fn => fn(figures), [isRedSquare, isRedStar, isRedCircle, isRedTriangle]);
+    const countRedFigures = R.count(R.equals(true));
+    const redFiguresCount = countRedFigures(redFigures);
+
+    const blueFigures = R.map(fn => fn(figures), [isBlueSquare, isBlueStar, isBlueCircle, isBlueTriangle]);
+    const countBlueFigures = R.count(R.equals(true));
+    const blueFiguresCount = countBlueFigures(blueFigures);
+
+    return blueFiguresCount === redFiguresCount;
+};
 
 // 4. Синий круг, красная звезда, оранжевый квадрат треугольник любого цвета
 export const validateFieldN4 = () => false;
