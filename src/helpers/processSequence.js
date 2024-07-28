@@ -17,22 +17,21 @@
 import Api from '../tools/api';
 import * as R from 'ramda';
 
+//валидация инпута
 const isMinLengthValid = (str) => str.trim().length > 2;
 const isMaxLengthValid = (str) => str.trim().length < 10;
-
 const isNumberPositive = (str) => parseFloat(str) >= 0;
-
 const isValidCharacters = (str) => /^\d+(\.\d+)?$/.test(str.trim());
 
 const isValidInput = R.allPass([isMinLengthValid, isMaxLengthValid, isNumberPositive, isValidCharacters]);
 
+//Получение числа и его округление
 const strToNumber = (str) => parseFloat(str);
 const roundNumber = (num) => Math.round(num);
-
 const getNumber = R.compose(roundNumber, strToNumber);
 
+//работа с api
 const getResult = R.prop('result');
-
 const api = new Api();
 const getAnimal = async (id) => {
     const url = `https://animals.tech/${id}`;
@@ -57,8 +56,8 @@ const getNumbersBaseInfo = async ({from, to, number}) => {
     }
 };
 
+//преобразование результата
 const countSymbols = (str) => str.length;
-
 const binaryToDecimal = (binary) => parseInt(binary, 2);
 const squareBinaryNumber = (binary) => {
     const decimal = binaryToDecimal(binary);
@@ -67,15 +66,6 @@ const squareBinaryNumber = (binary) => {
 const getRemainder = (binary) => {
     return squareBinaryNumber(binary) % 3;
 };
-
-
-/**
-  * Я – пример, удали меня
-  */
- const wait = time => new Promise(resolve => {
-     setTimeout(resolve, time);
- })
-
 const processSequence = async ({value, writeLog, handleSuccess, handleError}) => {
     writeLog(value);
     if (!isValidInput(value)) {
@@ -95,26 +85,3 @@ const processSequence = async ({value, writeLog, handleSuccess, handleError}) =>
 }
 
 export default processSequence;
-
-/*
-const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-
-    writeLog(value);
-
-    api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '101'}).then(({result}) => {
-        writeLog(result);
-    });
-
-    wait(2500).then(() => {
-        writeLog('SecondLog')
-
-        return wait(1500);
-    }).then(() => {
-        writeLog('ThirdLog');
-
-        return wait(400);
-    }).then(() => {
-        handleSuccess('Done');
-    });
-}
-*/
