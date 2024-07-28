@@ -14,38 +14,107 @@
  * Иногда промисы от API будут приходить в состояние rejected, (прямо как и API в реальной жизни)
  * Ответ будет приходить в поле {result}
  */
- import Api from '../tools/api';
+import Api from '../tools/api';
+import * as R from 'ramda';
 
- const api = new Api();
+const isMinLengthValid = (str) => str.trim().length > 2;
+const isMaxLengthValid = (str) => str.trim().length < 10;
 
- /**
+const isNumberPositive = (str) => parseFloat(str) >= 0;
+
+const isValidCharacters = (str) => /^\d+(\.\d+)?$/.test(str.trim());
+
+const isValidInput = R.allPass([isMinLengthValid, isMaxLengthValid, isNumberPositive, isValidCharacters]);
+
+const strToNumber = (str) => parseFloat(str);
+const roundNumber = (num) => Math.round(num);
+
+const getNumber = R.compose(roundNumber, strToNumber);
+
+const getResult = R.prop('result');
+
+const api = new Api();
+const getAnimal = async (id) => {
+    const url = `https://animals.tech/${id}`;
+    try {
+        const response = await api.get(url, {});
+        return getResult(response);
+    } catch (error) {
+        console.error(error);
+        await getAnimal(id);
+    }
+};
+
+const getNumbersBaseInfo = async ({from, to, number}) => {
+    const url = 'https://api.tech/numbers/base';
+    const params = {from, to, number};
+    try {
+        const response = await api.get(url, params);
+        return getResult(response);
+    } catch (error) {
+        console.error(error);
+        await getNumbersBaseInfo({from, to, number});
+    }
+};
+
+const countSymbols = (str) => str.length;
+
+const binaryToDecimal = (binary) => parseInt(binary, 2);
+const squareBinaryNumber = (binary) => {
+    const decimal = binaryToDecimal(binary);
+    return Math.pow(decimal, 2);
+};
+const getRemainder = (binary) => {
+    return squareBinaryNumber(binary) % 3;
+};
+
+
+/**
   * Я – пример, удали меня
   */
  const wait = time => new Promise(resolve => {
      setTimeout(resolve, time);
  })
 
- const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-     /**
-      * Я – пример, удали меня
-      */
-     writeLog(value);
-
-     api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '01011010101'}).then(({result}) => {
-         writeLog(result);
-     });
-
-     wait(2500).then(() => {
-         writeLog('SecondLog')
-
-         return wait(1500);
-     }).then(() => {
-         writeLog('ThirdLog');
-
-         return wait(400);
-     }).then(() => {
-         handleSuccess('Done');
-     });
- }
+const processSequence = async ({value, writeLog, handleSuccess, handleError}) => {
+    writeLog(value);
+    if (!isValidInput(value)) {
+        return handleError('ValidationError')
+    }
+    const currNum = getNumber(value);
+    writeLog(currNum);
+    const binaryNum = await getNumbersBaseInfo({from: 10, to: 2, number: currNum});
+    writeLog(binaryNum);
+    const getRemainderOfNum = R.compose(writeLog, getRemainder);
+    const getCountedSymbols = R.compose(writeLog, countSymbols);
+    const getPoweredNum = R.compose(writeLog, squareBinaryNumber);
+    const getMappedNum = R.compose(getRemainder, R.tap(getRemainderOfNum), R.tap(getPoweredNum), R.tap(getCountedSymbols));
+    const rem = getMappedNum(binaryNum);
+    const animal = await getAnimal(rem);
+    return handleSuccess(animal);
+}
 
 export default processSequence;
+
+/*
+const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
+
+    writeLog(value);
+
+    api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '101'}).then(({result}) => {
+        writeLog(result);
+    });
+
+    wait(2500).then(() => {
+        writeLog('SecondLog')
+
+        return wait(1500);
+    }).then(() => {
+        writeLog('ThirdLog');
+
+        return wait(400);
+    }).then(() => {
+        handleSuccess('Done');
+    });
+}
+*/

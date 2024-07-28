@@ -14,14 +14,6 @@ import * as R from 'ramda'
  *
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
-/*
-RED: 'red',
-    BLUE: 'blue',
-    ORANGE: 'orange',
-    GREEN: 'green',
-    WHITE: 'white',
-
- */
 const isRed = (figureColor) => figureColor === 'red';
 const isBlue = (figureColor) => figureColor === 'blue';
 const isOrange = (figureColor) => figureColor === 'orange';
